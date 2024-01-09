@@ -13,7 +13,7 @@ from datetime import datetime
 from math import sqrt
 
 
-filename1 = "/home/sacchin/Desktop/dnt/RL Tutorials/Grid Worlds/0.1grid_world.pkl"
+filename1 = "/home/sacchin/Desktop/dnt/RL_Tutorials/Grid Worlds/0.1grid_world.pkl"
 
 
 # Check for GPU and set the device accordingly
@@ -126,7 +126,7 @@ class DQNAgent:
         self.memory = deque(maxlen=2000)
         self.gamma = 0.5  # discount rate
         self.epsilon = 1.0  # exploration rate
-        self.epsilon_min = 0.1
+        self.epsilon_min = 0.5
         self.epsilon_decay = 0.99999
         self.learning_rate = 0.001
         self.model = DQNNetwork(state_size, action_size)
@@ -188,8 +188,8 @@ class DQNAgent:
 # Main training loop
 env = GeneralGridWorld(filename1)
 agent = DQNAgent(100*100, 4)
-# agent.load("/home/sacchin/Desktop/dnt/RL Tutorials/2: DQN/models/dqn_model_17_01_.pth")
-episodes = 500000
+agent.load("/home/sacchin/Desktop/dnt/RL_Tutorials/2: DQN/models/dqn_model_nye.pth")
+episodes = 10
 sequential_rewards = []
 for e in tqdm(range(episodes)):
     state = env.reset()
@@ -210,17 +210,20 @@ plt.plot(sequential_rewards)
 plt.show()
 
 # model_save_path = "/home/sacchin/Desktop/dnt/RL Tutorials/2: DQN/models/dqn_model"+datetime.now().strftime("_%H_%M_")+".pth"  # Update this path as needed
-model_save_path = "/home/sacchin/Desktop/dnt/RL Tutorials/2: DQN/models/dqn_model_nye.pth"
+model_save_path = "/home/sacchin/Desktop/dnt/RL_Tutorials/2: DQN/models/dqn_model_nye.pth"
 agent.save(model_save_path)
 print(f"Model saved to {model_save_path}")
 
 # Visualization after training
 state = env.reset()
 state = torch.FloatTensor(state).to(device)
+agent.epsilon = 0.1
+agent.epsilon_min = 0.1
 env.render()
 done = False
 i = 0
 while not done and i<500:
+    print(agent.epsilon)
     action = agent.act(state)
     state, _, done = env.step(action)[:3]
     env.render()
